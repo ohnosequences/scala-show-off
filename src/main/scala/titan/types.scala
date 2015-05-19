@@ -22,13 +22,16 @@ case object types {
   case class Container[T](val values: Iterable[T]) extends AnyContainer { type Inside = T }
 
 
+  final type TitanGraph    = titan.TitanGraph
+  final type TitanElements = Container[titan.TitanElement]
   final type TitanVertices = Container[titan.TitanVertex]
   final type TitanEdges    = Container[titan.TitanEdge]
-  final type TitanQueries  = Container[blueprints.Query]
+  //final type TitanQueries  = Container[blueprints.Query]*/
 
   final type JIterable[T]  = java.lang.Iterable[T]
-  final type TitanUnit     = titan.TitanGraph
 
+  type EdgeLabel = String
+  type PropertyLabel = String
 
 
   /* Conversions */
