@@ -44,10 +44,10 @@ case object titan {
         GraphOps[core.TitanGraph, core.TitanVertex, core.TitanEdge] =
     new GraphOps[core.TitanGraph, core.TitanVertex, core.TitanEdge] {
 
-    def vertices[P <: AnyVertexPropertyType](
+    def vertices[PV](
       graph: Graph,
-      property: P,
-      values: Container[P#ValueType]
+      property: VertexPropertyType[PV],
+      values: Container[PV]
     ): Container[Vertex] =
       values flatMap { v =>
         graph.query.has(property.label, v)
