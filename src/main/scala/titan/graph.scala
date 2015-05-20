@@ -1,13 +1,14 @@
 package ohnosequences.scala.titan
 
-case object graph {
+import ohnosequences.scala.graph._
+import ohnosequences.scala.titan.types._
+import com.thinkaurelius.titan.{ core => titan }
 
-  import ohnosequences.scala.graph._
-  import ohnosequences.scala.titan.types._
+import com.tinkerpop.blueprints.Direction
+import scala.collection.JavaConverters.{ asJavaIterableConverter, iterableAsScalaIterableConverter }
 
-  import com.tinkerpop.blueprints.Direction
-  import scala.collection.JavaConverters.{ asJavaIterableConverter, iterableAsScalaIterableConverter }
 
+case object graph extends OtherPriority {
 
   implicit def titanVertex:
         Vertex[TitanVertices, EdgeLabel] =
@@ -35,9 +36,9 @@ case object graph {
   }
 
 
-  implicit def titanGraphStringVertices[T]:
-        Graph[TitanGraph, PropertyLabel, Iterable[T], TitanVertices] =
-    new Graph[TitanGraph, PropertyLabel, Iterable[T], TitanVertices] {
+  implicit def titanGraphStringVertices:
+        Graph[TitanGraph, PropertyLabel, Seq[String], TitanVertices] =
+    new Graph[TitanGraph, PropertyLabel, Seq[String], TitanVertices] {
 
     def lookup(graph: Graph, property: Property, values: Values): Elements =
       Container(
@@ -48,9 +49,21 @@ case object graph {
       )
   }
 
-  implicit def titanGraphStringEdges[T]:
-        Graph[TitanGraph, PropertyLabel, Iterable[T], TitanEdges] =
-    new Graph[TitanGraph, PropertyLabel, Iterable[T], TitanEdges] {
+  implicit def titanElement[E <: titan.TitanElement, T]:
+        Element[Container[E], PropertyLabel, Container[T]] =
+    new Element[Container[E], PropertyLabel, Container[T]] {
+
+    def get(elements: Elements, property: Property): Values =
+      elements.map{ _.getProperty[T](property) }
+  }
+
+}
+
+trait OtherPriority {
+
+  implicit def titanGraphStringEdges:
+        Graph[TitanGraph, PropertyLabel, Seq[String], TitanEdges] =
+    new Graph[TitanGraph, PropertyLabel, Seq[String], TitanEdges] {
 
     def lookup(graph: Graph, property: Property, values: Values): Elements =
       Container(
@@ -59,15 +72,6 @@ case object graph {
           .edges.asTitanEdges
         }
       )
-  }
-
-
-  implicit def titanElement[T]:
-        Element[TitanElements, PropertyLabel, Iterable[T]] =
-    new Element[TitanElements, PropertyLabel, Iterable[T]] {
-
-    def get(elements: Elements, property: Property): Values =
-      elements.values.map{ _.getProperty[T](property) }
   }
 
 }
