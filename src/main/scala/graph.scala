@@ -2,6 +2,10 @@ package ohnosequences.scala
 
 case object graph {
 
+  object AnyVertex {
+
+    type of[V,E] = AnyVertex { type Vertices = V; type Edge = E }
+  }
   trait AnyVertex {
 
     type Vertices
@@ -17,11 +21,11 @@ case object graph {
     type Edge = E
   }
 
-  implicit def addVertexOps[V, E](v: V)(implicit vo: Vertex[V, E]):
+  implicit def addVertexOps[V, E](v: V)(implicit vo: AnyVertex { type Vertices = V; type Edge = E } ):
     VertexOps[V, E] =
     VertexOps[V, E](v)(vo)
 
-  case class VertexOps[V, E](v: V)(vo: Vertex[V, E]) {
+  case class VertexOps[V, E](v: V)(vo: AnyVertex { type Vertices = V; type Edge = E }) {
 
     def outV(e: E): V = vo.outV(v, e)
     def inV(e: E): V = vo.inV(v, e)

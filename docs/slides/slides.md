@@ -95,6 +95,10 @@ trait A
 trait C[Z <: A]
 ```
 
+### Interfaces
+
++ code = **traits**
+
 ### Type system
 
 - Incredibly complex
