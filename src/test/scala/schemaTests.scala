@@ -1,27 +1,13 @@
-package ohnosequences.scala.titan.test
+package ohnosequences.scala.test
 
-import com.thinkaurelius.titan.{ core => titan }
-import titan.Multiplicity._
-import java.io.File
+import com.thinkaurelius.titan.core
+import scala.collection.JavaConverters.{ asJavaIterableConverter, iterableAsScalaIterableConverter }
 
 class TitanSuite extends org.scalatest.FunSuite with org.scalatest.BeforeAndAfterAll {
 
-  val graph = titan.TitanFactory.open("inmemory")
+  val graph = core.TitanFactory.open("inmemory")
 
   override final def beforeAll() {
-
-    // graph.makePropertyKey("name").dataType(classOf[String]).make()
-    // graph.makePropertyKey("age").dataType(classOf[Integer]).make()
-    // graph.makePropertyKey("text").dataType(classOf[String]).make()
-    // graph.makePropertyKey("url").dataType(classOf[String]).make()
-    // graph.makePropertyKey("time").dataType(classOf[String]).make()
-
-    // graph.makeVertexLabel("user").make()
-    // graph.makeVertexLabel("tweet").make()
-
-    // graph.makeEdgeLabel("posted").multiplicity(ONE2MANY).make()
-    // graph.makeEdgeLabel("follows").multiplicity(MULTI).make()
-
     import com.tinkerpop.blueprints.util.io.graphson._
     GraphSONReader.inputGraph(graph, this.getClass.getResource("/twitter_graph.json").getPath)
 
@@ -35,23 +21,41 @@ class TitanSuite extends org.scalatest.FunSuite with org.scalatest.BeforeAndAfte
   }
 
 
+  import ohnosequences.scala.schema._
   import ohnosequences.scala.graph._
-  import ohnosequences.scala.titan.types._
-  import ohnosequences.scala.titan.graph._
+  import ohnosequences.scala.titan._
+
+  object twitterSchema {
+
+    val user = VertexType("user")
+    val name = VertexPropertyType[String]("name")(user)
+    val age = VertexPropertyType[Integer]("age")(user)
+
+    val tweet = VertexType("tweet")
+    val text = VertexPropertyType[String]("text")(tweet)
+    val url  = VertexPropertyType[String]("url")(tweet)
+
+    val posted = EdgeType("posted")(user, tweet)
+    val time = EdgePropertyType[String]("time")(posted) // should have some better raw type
+
+    val follows = EdgeType("follows")(user, user)
+  }
+
+  //implicit def toContainer[T](v: Seq[T]): Container[T] = v*/
 
   test("eval basic queries over sample twitter graph") {
-
-    val names = Seq("@laughedelic", "@eparejatobes", "@evdokim")
+    import twitterSchema._
 
     lazy val query = graph
-      .lookup("name", names)
-      .outV("posted")
-      .inV("posted")
-      .outV("follows")
-      .get("name")
+      // FIXME: without name.type it doesn't infer property's type
+      .vertices[name.type](name, Seq("@laughedelic", "@eparejatobes", "@evdokim"))
+      .outV(posted)
+      .inV(posted)
+      .outV(follows)
+      .get(name)
 
     println("----------------\n")
-    query.values.foreach(println)
+    query.foreach(println)
     println("\n----------------")
   }
 

@@ -1,85 +1,125 @@
 package ohnosequences.scala
 
-case object graph {
+case object schema {
 
-  trait AnyVertex {
+  trait AnyLabeledType {
 
-    type Vertices
-    type Edge
-
-    def outV(vertices: Vertices, edge: Edge): Vertices
-    def inV(vertices: Vertices, edge: Edge): Vertices
+    val label: String
   }
 
-  trait Vertex[V, E] extends AnyVertex {
 
-    type Vertices = V
+  trait AnyElementType extends AnyLabeledType
+
+  case class VertexType(val label: String) extends AnyElementType
+  case class EdgeType(val label: String)(val src: VertexType, val tgt: VertexType) extends AnyElementType
+
+
+  trait AnyPropertyType extends AnyLabeledType {
+
+    type ValueType
+  }
+
+  trait AnyVertexPropertyType extends AnyPropertyType
+  case class VertexPropertyType[VT](val label: String)(val owner: VertexType)
+    extends AnyVertexPropertyType { type ValueType = VT }
+
+  trait AnyEdgePropertyType extends AnyPropertyType
+  case class EdgePropertyType[VT](val label: String)(val owner: EdgeType)
+    extends AnyEdgePropertyType { type ValueType = VT }
+
+}
+
+
+case object graph {
+
+  import schema._
+
+  type Container[X] = Iterable[X]
+
+
+  trait AnyVertexOps {
+
+    type Vertex
+
+    def outV(vertex: Vertex, edgeType: EdgeType): Container[Vertex]
+    def inV(vertex: Vertex, edgeType: EdgeType): Container[Vertex]
+  }
+
+  trait VertexOps[V] extends AnyVertexOps { type Vertex = V }
+
+
+  implicit def addVerticesSyntax[V](vs: Container[V])(implicit vops: VertexOps[V]):
+    VerticesSyntax[V] =
+    VerticesSyntax[V](vs)(vops)
+
+  case class VerticesSyntax[V](vs: Container[V])(vops: VertexOps[V]) {
+
+    def outV(et: EdgeType): Container[V] = vs flatMap { vops.outV(_, et) }
+    def  inV(et: EdgeType): Container[V] = vs flatMap { vops.inV(_, et) }
+  }
+
+
+
+  trait AnyElementOps {
+
+    type Element
+
+    def get[P <: AnyPropertyType](element: Element, property: P): P#ValueType
+  }
+
+  trait ElementOps[E] extends AnyElementOps { type Element = E }
+
+
+  implicit def addElementSyntax[E](es: Container[E])(implicit eops: ElementOps[E]):
+    ElementSyntax[E] =
+    ElementSyntax[E](es)(eops)
+
+  case class ElementSyntax[E](es: Container[E])(eops: ElementOps[E]) {
+
+    def get[P <: AnyPropertyType](p: P): Container[P#ValueType] = es map { eops.get(_, p) }
+  }
+
+
+
+  trait AnyGraphOps {
+
+    type Graph
+    type Vertex
+    type Edge
+
+    def vertices[P <: AnyVertexPropertyType](
+      graph: Graph,
+      property: P,
+      values: Container[P#ValueType]
+    ): Container[Vertex]
+
+    def edges[P <: AnyEdgePropertyType](
+      graph: Graph,
+      property: P,
+      values: Container[P#ValueType]
+    ): Container[Edge]
+  }
+
+  trait GraphOps[G, V, E] extends AnyGraphOps {
+
+    type Graph = G
+    type Vertex = V
     type Edge = E
   }
 
-  implicit def addVertexOps[V, E](v: V)(implicit vo: Vertex[V, E]):
-    VertexOps[V, E] =
-    VertexOps[V, E](v)(vo)
 
-  case class VertexOps[V, E](v: V)(vo: Vertex[V, E]) {
+  implicit def addGraphSyntax[G, V, E](g: G)(implicit gops: GraphOps[G, V, E]):
+    GraphSyntax[G, V, E] =
+    GraphSyntax[G, V, E](g)(gops)
 
-    def outV(e: E): V = vo.outV(v, e)
-    def inV(e: E): V = vo.inV(v, e)
-  }
+  case class GraphSyntax[G, V, E](g: G)(gops: GraphOps[G, V, E]) {
 
+    def vertices[P <: AnyVertexPropertyType]
+      (p: P, vs: Container[P#ValueType]): Container[V] =
+        gops.vertices(g, p, vs)
 
-
-  trait AnyElement {
-
-    type Elements
-    type Property
-    type Values
-
-    def get(elements: Elements, property: Property): Values
-  }
-
-  trait Element[E, P, V] extends AnyElement {
-
-    type Elements = E
-    type Property = P
-    type Values = V
-  }
-
-  implicit def addElementOps[E, P, V](e: E)(implicit eo: Element[E, P, V]):
-    ElementOps[E, P, V] =
-    ElementOps[E, P, V](e)(eo)
-
-  case class ElementOps[E, P, V](e: E)(eo: Element[E, P, V]) {
-
-    def get(p: P): V = eo.get(e, p)
-  }
-
-
-
-  trait AnyGraph {
-
-    type Graph
-    type Property
-    type Values
-    type Elements
-
-    def lookup(graph: Graph, property: Property, values: Values): Elements
-  }
-
-  trait Graph[G, P, V, E] extends AnyGraph {
-
-    type Graph = G
-    type Property = P
-    type Values = V
-    type Elements = E
-  }
-
-  implicit def addGraphOps[G, P, V, E](g: G)(implicit go: Graph[G, P, V, E]):
-    GraphOps[G, P, V, E] =
-    GraphOps[G, P, V, E](g)(go)
-
-  case class GraphOps[G, P, V, E](g: G)(go: Graph[G, P, V, E]) {
-
-    def lookup(p: P, v: V): E = go.lookup(g, p, v)
+    def edges[P <: AnyEdgePropertyType]
+      (p: P, vs: Container[P#ValueType]): Container[E] =
+        gops.edges(g, p, vs)
   }
 }
