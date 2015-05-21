@@ -48,7 +48,7 @@ class TitanSuite extends org.scalatest.FunSuite with org.scalatest.BeforeAndAfte
 
     lazy val query = graph
       // FIXME: without name.type it doesn't infer property's type
-      .vertices[name.type](name, Seq("@laughedelic", "@eparejatobes", "@evdokim"))
+      .vertices(name, Seq("@laughedelic", "@eparejatobes", "@evdokim"))
       .outV(posted)
       .inV(posted)
       .outV(follows)
@@ -58,5 +58,4 @@ class TitanSuite extends org.scalatest.FunSuite with org.scalatest.BeforeAndAfte
     query.foreach(println)
     println("\n----------------")
   }
-
 }

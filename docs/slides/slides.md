@@ -55,7 +55,7 @@ All the huge Java library ecosystem directly available!
 - functions
 - immutable values
 - (primitive) recursion support
-- method <--> function
+- method ⟷ function
 
 ----
 
@@ -91,7 +91,7 @@ def factorial(x: Int): Int = factorial_rec(x,1)
 
 ----
 
-### Methods <--> functions
+### Methods ⟷ functions
 
 ``` scala
 val f: Int => Int = factorial
@@ -120,7 +120,7 @@ def length[X](l: List[X]): Int = length_rec(l,0)
 @tailrec def length_rec[X](l: List[X], acc: Int): Int = l match { 
 
   case Nil      => acc
-  case x :: xs  => length_rec(l, 1 + acc) 
+  case x :: xs  => length_rec(xs, 1 + acc) 
 }
 ```
 <!-- and much more. Mention extractors, but also buggy implementation, type refinement not working, etc -->
@@ -163,7 +163,8 @@ trait Equals[X] {
 ### Objects
 
 ``` scala
-object DefaultIntEquals extends Equals[Int] {
+// why implicit? wait a bit
+implicit object DefaultIntEquals extends Equals[Int] {
 
   // default eq
   def eq(x: Int, other: Int): Boolean = x == y
@@ -220,15 +221,13 @@ Uses:
 
 ### Type classes through implicits
 
-Traits for defining them
+Define syntax
 
 ``` scala
-trait AnyMonoid {
-
-  type M
-
-  def combine(x1: X, x2: X): X
-  def unit: X
+case class EqualsSyntax[X](val x: X, val equals: Equals[X]) {
+  import eq._
+  def ===(other: X): Boolean = eq(x,other)
+  def !==(other: X): Boolean = notEq(x,other)
 }
 ```
 
@@ -236,31 +235,23 @@ trait AnyMonoid {
 
 ### Type classes through implicits II
 
-Define syntax
+Provide it
 
 ``` scala
-case class MonoidSyntax[X, Monoid <: AnyMonoid { type M = X }](val x: X) {
-  
-  def ⋅(other: X)(implicit monoid: Monoid): X = monoid.combine(x,other)
-}
+implicit def equalsSyntax[X](x: X)(implicit eq: Equals[X]): EqualsSyntax[X] = EqualsSyntax(x,eq)
 ```
+
+----
 
 ### Type classes through implicits III
-
-implicits for providing syntax
-
-``` scala
-implicit def monoidSyntax[X, Monoid <: AnyMonoid { type M = X }](x: X)(implicit m: Monoid): MonoidSyntax[X,M] = 
-  MonoidSyntax(x)
-```
-
-### Type classes through implicits IV
 
 use it!
 
 ``` scala
-val z = x ⋅ y
+val tt = 1 === 1
 ```
+
+----
 
 ### Type system summary
 
@@ -272,9 +263,9 @@ val z = x ⋅ y
 
 #### Single most useful feature
 
-**Type members and refinements!!**
+**Type members** (together with refinements)
 
-and **implicits**! yeah that's two
+... and **implicits**! yeah that's two :)
 
 ----
 
@@ -290,17 +281,21 @@ and **implicits**! yeah that's two
 
 ### Ecosystem
 
+- Twitter stuff: [Finagle](https://twitter.github.io/finagle/), [Algebird](https://github.com/twitter/algebird), [util](https://github.com/twitter/util), [summingbird](https://github.com/twitter/summingbird)
 - [Spark](https://spark.apache.org/)
 - [Akka](http://akka.io/)
-- Twitter stuff: [Finagle](https://twitter.github.io/finagle/), [Algebird](https://github.com/twitter/algebird), [util](https://github.com/twitter/util), [summingbird](https://github.com/twitter/summingbird)
-- https://github.com/non/spire
+- [typelevel libraries](http://typelevel.org/)
+
+----
 
 ### Our (positive) experience
 
 1. JVM, Java compat: incredibly useful
 2. really cool things are possible, but really hard. But possible!
-3. writing reasonably fast easy to understand code for normal tasks
+3. writing reasonably fast, easy to understand code without effort
 4. extensible build tool: [sbt](http://www.scala-sbt.org/)
+
+----
 
 ### Our (negative) experience
 
