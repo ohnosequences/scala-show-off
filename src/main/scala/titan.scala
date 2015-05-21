@@ -12,8 +12,8 @@ import scala.collection.JavaConverters.{ asJavaIterableConverter, iterableAsScal
 case object titan {
 
   implicit def titanVertexOps:
-        VertexOps[core.TitanVertex] =
-    new VertexOps[core.TitanVertex] {
+        VertexEdgeOps[core.TitanVertex, core.TitanEdge] =
+    new VertexEdgeOps[core.TitanVertex, core.TitanEdge] {
 
       def outV(vertex: Vertex, edgeType: EdgeType): Container[Vertex] =
         vertex
@@ -28,6 +28,24 @@ case object titan {
           .labels(edgeType.label)
           .direction(Direction.IN)
           .vertexIds.asScala
+
+      def outE(vertex: Vertex, edgeType: EdgeType): Container[Edge] =
+        vertex
+          .query
+          .labels(edgeType.label)
+          .direction(Direction.OUT)
+          .titanEdges.asScala
+
+      def inE(vertex: Vertex, edgeType: EdgeType): Container[Edge] =
+        vertex
+          .query
+          .labels(edgeType.label)
+          .direction(Direction.IN)
+          .titanEdges.asScala
+
+      def source(edge: Edge): Vertex = edge.getVertex(Direction.OUT)
+
+      def target(edge: Edge): Vertex = edge.getVertex(Direction.IN)
   }
 
 

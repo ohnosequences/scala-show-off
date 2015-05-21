@@ -19,13 +19,11 @@ case object schema {
     type ValueType
   }
 
-  trait AnyVertexPropertyType extends AnyPropertyType
   case class VertexPropertyType[VT](val label: String)(val owner: VertexType)
-    extends AnyVertexPropertyType { type ValueType = VT }
+    extends AnyPropertyType { type ValueType = VT }
 
-  trait AnyEdgePropertyType extends AnyPropertyType
   case class EdgePropertyType[VT](val label: String)(val owner: EdgeType)
-    extends AnyEdgePropertyType { type ValueType = VT }
+    extends AnyPropertyType { type ValueType = VT }
 
 }
 
@@ -37,27 +35,51 @@ case object graph {
   type Container[X] = Iterable[X]
 
 
-  trait AnyVertexOps {
+  trait AnyVertexEdgeOps {
 
     type Vertex
+    type Edge
 
     def outV(vertex: Vertex, edgeType: EdgeType): Container[Vertex]
     def inV(vertex: Vertex, edgeType: EdgeType): Container[Vertex]
+
+    def outE(vertex: Vertex, edgeType: EdgeType): Container[Edge]
+    def inE(vertex: Vertex, edgeType: EdgeType): Container[Edge]
+
+    def source(edge: Edge): Vertex
+    def target(edge: Edge): Vertex
   }
 
-  trait VertexOps[V] extends AnyVertexOps { type Vertex = V }
+  trait VertexEdgeOps[V, E] extends AnyVertexEdgeOps {
 
-
-  implicit def addVerticesSyntax[V](vs: Container[V])(implicit vops: VertexOps[V]):
-    VerticesSyntax[V] =
-    VerticesSyntax[V](vs)(vops)
-
-  case class VerticesSyntax[V](vs: Container[V])(vops: VertexOps[V]) {
-
-    def outV(et: EdgeType): Container[V] = vs flatMap { vops.outV(_, et) }
-    def  inV(et: EdgeType): Container[V] = vs flatMap { vops.inV(_, et) }
+    type Vertex = V
+    type Edge = E
   }
 
+
+  implicit def addVerticesSyntax[V, E](vs: Container[V])(implicit veops: VertexEdgeOps[V, E]):
+    VerticesSyntax[V, E] =
+    VerticesSyntax[V, E](vs)(veops)
+
+  case class VerticesSyntax[V, E](vs: Container[V])(veops: VertexEdgeOps[V, E]) {
+
+    def outV(et: EdgeType): Container[V] = vs flatMap { veops.outV(_, et) }
+    def  inV(et: EdgeType): Container[V] = vs flatMap { veops.inV(_, et) }
+
+    def outE(et: EdgeType): Container[E] = vs flatMap { veops.outE(_, et) }
+    def  inE(et: EdgeType): Container[E] = vs flatMap { veops.inE(_, et) }
+  }
+
+
+  implicit def addEdgesSyntax[V, E](es: Container[E])(implicit veops: VertexEdgeOps[V, E]):
+    EdgesSyntax[V, E] =
+    EdgesSyntax[V, E](es)(veops)
+
+  case class EdgesSyntax[V, E](es: Container[E])(veops: VertexEdgeOps[V, E]) {
+
+    def source: Container[V] = es map { veops.source(_) }
+    def target: Container[V] = es map { veops.target(_) }
+  }
 
 
   trait AnyElementOps {

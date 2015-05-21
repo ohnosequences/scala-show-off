@@ -57,4 +57,21 @@ class TitanSuite extends org.scalatest.FunSuite with org.scalatest.BeforeAndAfte
     println("\n----------------")
   }
 
+  test("eval basic queries with edges") {
+    import twitterSchema._
+
+    lazy val query = graph
+      .vertices(name, Seq("@laughedelic"))
+      .outE(posted)
+      .source
+      .inE(follows)
+      .target
+      .outE(posted)
+      .get(time)
+
+    println("----------------\n")
+    query.foreach(println)
+    println("\n----------------")
+  }
+
 }
