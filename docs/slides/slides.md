@@ -117,7 +117,7 @@ def factorialAgain(x: Int) = f(x)
 ``` scala
 def length[X](l: List[X]): Int = length_rec(l,0)
 
-@tailrec def length_rec[X](l: List[X], acc: Int): Int = l match { 
+@tailrec def length_rec[X](l: List[X], acc: Int): Int = l match {
 
   case Nil      => acc
   case x :: xs  => length_rec(xs, 1 + acc) 
