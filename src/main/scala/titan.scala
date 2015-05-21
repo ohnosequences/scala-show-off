@@ -15,28 +15,28 @@ case object titan {
         VertexEdgeOps[core.TitanVertex, core.TitanEdge] =
     new VertexEdgeOps[core.TitanVertex, core.TitanEdge] {
 
-      def outV(vertex: Vertex, edgeType: EdgeType): Container[Vertex] =
+      def outV(vertex: Vertex, edgeType: EdgeType): Many[Vertex] =
         vertex
           .query
           .labels(edgeType.label)
           .direction(Direction.OUT)
           .vertexIds.asScala
 
-      def inV(vertex: Vertex, edgeType: EdgeType): Container[Vertex] =
+      def inV(vertex: Vertex, edgeType: EdgeType): Many[Vertex] =
         vertex
           .query
           .labels(edgeType.label)
           .direction(Direction.IN)
           .vertexIds.asScala
 
-      def outE(vertex: Vertex, edgeType: EdgeType): Container[Edge] =
+      def outE(vertex: Vertex, edgeType: EdgeType): Many[Edge] =
         vertex
           .query
           .labels(edgeType.label)
           .direction(Direction.OUT)
           .titanEdges.asScala
 
-      def inE(vertex: Vertex, edgeType: EdgeType): Container[Edge] =
+      def inE(vertex: Vertex, edgeType: EdgeType): Many[Edge] =
         vertex
           .query
           .labels(edgeType.label)
@@ -65,21 +65,21 @@ case object titan {
     def vertices[VT](
       graph: Graph,
       property: VertexPropertyType[VT],
-      values: Container[VT]
-    ): Container[Vertex] =
+      values: Many[VT]
+    ): Many[Vertex] =
       values flatMap { v =>
         graph.query.has(property.label, v)
-          .vertices.asScala.asInstanceOf[Container[core.TitanVertex]]
+          .vertices.asScala.asInstanceOf[Many[core.TitanVertex]]
       }
 
     def edges[VT](
       graph: Graph,
       property: EdgePropertyType[VT],
-      values: Container[VT]
-    ): Container[Edge] =
+      values: Many[VT]
+    ): Many[Edge] =
       values flatMap { v =>
         graph.query.has(property.label, v)
-          .edges.asScala.asInstanceOf[Container[core.TitanEdge]]
+          .edges.asScala.asInstanceOf[Many[core.TitanEdge]]
       }
   }
 
