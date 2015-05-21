@@ -12,22 +12,40 @@ import scala.collection.JavaConverters.{ asJavaIterableConverter, iterableAsScal
 case object titan {
 
   implicit def titanVertexOps:
-        VertexOps[core.TitanVertex] =
-    new VertexOps[core.TitanVertex] {
+        VertexEdgeOps[core.TitanVertex, core.TitanEdge] =
+    new VertexEdgeOps[core.TitanVertex, core.TitanEdge] {
 
-      def outV(vertex: Vertex, edgeType: EdgeType): Container[Vertex] =
+      def outV(vertex: Vertex, edgeType: EdgeType): Many[Vertex] =
         vertex
           .query
           .labels(edgeType.label)
           .direction(Direction.OUT)
           .vertexIds.asScala
 
-      def inV(vertex: Vertex, edgeType: EdgeType): Container[Vertex] =
+      def inV(vertex: Vertex, edgeType: EdgeType): Many[Vertex] =
         vertex
           .query
           .labels(edgeType.label)
           .direction(Direction.IN)
           .vertexIds.asScala
+
+      def outE(vertex: Vertex, edgeType: EdgeType): Many[Edge] =
+        vertex
+          .query
+          .labels(edgeType.label)
+          .direction(Direction.OUT)
+          .titanEdges.asScala
+
+      def inE(vertex: Vertex, edgeType: EdgeType): Many[Edge] =
+        vertex
+          .query
+          .labels(edgeType.label)
+          .direction(Direction.IN)
+          .titanEdges.asScala
+
+      def source(edge: Edge): Vertex = edge.getVertex(Direction.OUT)
+
+      def target(edge: Edge): Vertex = edge.getVertex(Direction.IN)
   }
 
 
@@ -44,24 +62,24 @@ case object titan {
         GraphOps[core.TitanGraph, core.TitanVertex, core.TitanEdge] =
     new GraphOps[core.TitanGraph, core.TitanVertex, core.TitanEdge] {
 
-    def vertices[PV](
+    def vertices[VT](
       graph: Graph,
-      property: VertexPropertyType[PV],
-      values: Container[PV]
-    ): Container[Vertex] =
+      property: VertexPropertyType[VT],
+      values: Many[VT]
+    ): Many[Vertex] =
       values flatMap { v =>
         graph.query.has(property.label, v)
-          .vertices.asScala.asInstanceOf[Container[core.TitanVertex]]
+          .vertices.asScala.asInstanceOf[Many[core.TitanVertex]]
       }
 
-    def edges[P <: AnyEdgePropertyType](
+    def edges[VT](
       graph: Graph,
-      property: P,
-      values: Container[P#ValueType]
-    ): Container[Edge] =
+      property: EdgePropertyType[VT],
+      values: Many[VT]
+    ): Many[Edge] =
       values flatMap { v =>
         graph.query.has(property.label, v)
-          .edges.asScala.asInstanceOf[Container[core.TitanEdge]]
+          .edges.asScala.asInstanceOf[Many[core.TitanEdge]]
       }
   }
 

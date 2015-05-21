@@ -41,18 +41,32 @@ class TitanSuite extends org.scalatest.FunSuite with org.scalatest.BeforeAndAfte
     val follows = EdgeType("follows")(user, user)
   }
 
-  //implicit def toContainer[T](v: Seq[T]): Container[T] = v*/
-
   test("eval basic queries over sample twitter graph") {
     import twitterSchema._
 
     lazy val query = graph
-      // FIXME: without name.type it doesn't infer property's type
       .vertices(name, Seq("@laughedelic", "@eparejatobes", "@evdokim"))
       .outV(posted)
       .inV(posted)
       .outV(follows)
       .get(name)
+
+    println("----------------\n")
+    query.foreach(println)
+    println("\n----------------")
+  }
+
+  test("eval basic queries with edges") {
+    import twitterSchema._
+
+    lazy val query = graph
+      .vertices(name, Seq("@laughedelic"))
+      .outE(posted)
+      .source
+      .inE(follows)
+      .target
+      .outE(posted)
+      .get(time)
 
     println("----------------\n")
     query.foreach(println)
