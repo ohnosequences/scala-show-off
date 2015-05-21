@@ -87,16 +87,16 @@ case object graph {
     type Vertex
     type Edge
 
-    def vertices[PV](
+    def vertices[VT](
       graph: Graph,
-      property: VertexPropertyType[PV],
-      values: Container[PV]
+      property: VertexPropertyType[VT],
+      values: Container[VT]
     ): Container[Vertex]
 
-    def edges[P <: AnyEdgePropertyType](
+    def edges[VT](
       graph: Graph,
-      property: P,
-      values: Container[P#ValueType]
+      property: EdgePropertyType[VT],
+      values: Container[VT]
     ): Container[Edge]
   }
 
@@ -114,12 +114,12 @@ case object graph {
 
   case class GraphSyntax[G, V, E](g: G)(gops: GraphOps[G, V, E]) {
 
-    def vertices[PV]
-      (p: VertexPropertyType[PV], vs: Container[PV]): Container[V] =
+    def vertices[VT]
+      (p: VertexPropertyType[VT], vs: Container[VT]): Container[V] =
         gops.vertices(g, p, vs)
 
-    def edges[P <: AnyEdgePropertyType]
-      (p: P, vs: Container[P#ValueType]): Container[E] =
+    def edges[VT]
+      (p: EdgePropertyType[VT], vs: Container[VT]): Container[E] =
         gops.edges(g, p, vs)
   }
 }

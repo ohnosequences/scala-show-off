@@ -44,20 +44,20 @@ case object titan {
         GraphOps[core.TitanGraph, core.TitanVertex, core.TitanEdge] =
     new GraphOps[core.TitanGraph, core.TitanVertex, core.TitanEdge] {
 
-    def vertices[PV](
+    def vertices[VT](
       graph: Graph,
-      property: VertexPropertyType[PV],
-      values: Container[PV]
+      property: VertexPropertyType[VT],
+      values: Container[VT]
     ): Container[Vertex] =
       values flatMap { v =>
         graph.query.has(property.label, v)
           .vertices.asScala.asInstanceOf[Container[core.TitanVertex]]
       }
 
-    def edges[P <: AnyEdgePropertyType](
+    def edges[VT](
       graph: Graph,
-      property: P,
-      values: Container[P#ValueType]
+      property: EdgePropertyType[VT],
+      values: Container[VT]
     ): Container[Edge] =
       values flatMap { v =>
         graph.query.has(property.label, v)
