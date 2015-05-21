@@ -40,6 +40,38 @@ object slides {
   }
 
 
+  sealed trait AnyTree {
+
+    type X
+  }
+  sealed trait Tree[X0] extends AnyTree { type X = X0 }
+  case class empty[A]() extends Tree[A]
+  object e extends empty[Nothing]
+  case class node[A, T <: AnyTree { type X <: A }](value: A, left: T, right: T) extends Tree[A]
+
+  val u = node("foo", e, e)
+
+  implicit class TreeOps[T <: AnyTree](tree: T) {
+    
+    def depth: Int = tree match {
+      case empty() => 0
+      case node(_, left, right) => 1 + math.max(left.depth, right.depth)
+    }
+
+    def showTree: String = tree match {
+      case empty() => "a leaf"
+      case node(value, left, right) => s"a branch with value $value, " +
+                                         s"left subtree (${left.showTree}), " +
+                                         s"right subtree (${right.showTree})"
+    }
+  }
+
+
+
+
+
+
+
   /*
   ### (G)ADTs
 

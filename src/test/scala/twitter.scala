@@ -72,4 +72,13 @@ class TitanSuite extends org.scalatest.FunSuite with org.scalatest.BeforeAndAfte
     query.foreach(println)
     println("\n----------------")
   }
+
+  test("oh") {
+
+    import ohnosequences.scala.slides._
+
+    println( node("foo", node("buuh", e, e), e).depth)
+
+    println( node("foo", node("buuh", e, e), e).showTree )
+  }
 }
