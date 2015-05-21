@@ -55,7 +55,7 @@ All the huge Java library ecosystem directly available!
 - functions
 - immutable values
 - (primitive) recursion support
-- method <--> function
+- method ⟷ function
 
 ----
 
@@ -91,7 +91,7 @@ def factorial(x: Int): Int = factorial_rec(x,1)
 
 ----
 
-### Methods <--> functions
+### Methods ⟷ functions
 
 ``` scala
 val f: Int => Int = factorial
@@ -117,10 +117,10 @@ def factorialAgain(x: Int) = f(x)
 ``` scala
 def length[X](l: List[X]): Int = length_rec(l,0)
 
-@tailrec def length_rec[X](l: List[X], acc: Int): Int = l match { 
+@tailrec def length_rec[X](l: List[X], acc: Int): Int = l match {
 
   case Nil      => acc
-  case x :: xs  => length_rec(l, 1 + acc) 
+  case x :: xs  => length_rec(l, 1 + acc)
 }
 ```
 <!-- and much more. Mention extractors, but also buggy implementation, type refinement not working, etc -->
@@ -240,7 +240,7 @@ Define syntax
 
 ``` scala
 case class MonoidSyntax[X, Monoid <: AnyMonoid { type M = X }](val x: X) {
-  
+
   def ⋅(other: X)(implicit monoid: Monoid): X = monoid.combine(x,other)
 }
 ```
@@ -250,7 +250,7 @@ case class MonoidSyntax[X, Monoid <: AnyMonoid { type M = X }](val x: X) {
 implicits for providing syntax
 
 ``` scala
-implicit def monoidSyntax[X, Monoid <: AnyMonoid { type M = X }](x: X)(implicit m: Monoid): MonoidSyntax[X,M] = 
+implicit def monoidSyntax[X, Monoid <: AnyMonoid { type M = X }](x: X)(implicit m: Monoid): MonoidSyntax[X,M] =
   MonoidSyntax(x)
 ```
 
