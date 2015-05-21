@@ -1,3 +1,9 @@
+---
+title: "Scala!"
+author: "@eparejatobes"
+date: today
+---
+
 # Scala?
 
 - [@eparejatobes](https://github.com/eparejatobes)
