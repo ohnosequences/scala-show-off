@@ -139,7 +139,7 @@ def factorialAgain(x: Int) = f(x)</code></pre>
 @tailrec def length_rec[X](l: List[X], acc: Int): Int = l match {
 
   case Nil      =&gt; acc
-  case x :: xs  =&gt; length_rec(xs, 1 + acc) 
+  case x :: xs  =&gt; length_rec(xs, 1 + acc)
 }</code></pre>
 </section><section id="section" class="slide level2">
 <h1><!-- and much more. Mention extractors, but also buggy implementation, type refinement not working, etc --></h1>
@@ -173,6 +173,8 @@ implicit object DefaultIntEquals extends Equals[Int] {
   // default eq
   def eq(x: Int, other: Int): Boolean = x == y
 }</code></pre>
+</section><section class="slide level2">
+
 <h3 id="type-dependent-types">Type-dependent types</h3>
 <pre class="scala"><code>trait AnyProperty {
 
@@ -210,15 +212,10 @@ val x: String = 2</code></pre>
   def ===(other: X): Boolean = eq(x,other)
   def !==(other: X): Boolean = notEq(x,other)
 }</code></pre>
-</section><section class="slide level2">
-
-<h3 id="type-classes-through-implicits-ii">Type classes through implicits II</h3>
 <p>Provide it</p>
-<pre class="scala"><code>implicit def equalsSyntax[X](x: X)(implicit eq: Equals[X]): EqualsSyntax[X] = EqualsSyntax(x,eq)</code></pre>
-</section><section class="slide level2">
-
-<h3 id="type-classes-through-implicits-iii">Type classes through implicits III</h3>
-<p>use it!</p>
+<pre class="scala"><code>implicit def equalsSyntax[X](x: X)
+  (implicit eq: Equals[X]): EqualsSyntax[X] = EqualsSyntax(x,eq)</code></pre>
+<p>Use it!</p>
 <pre class="scala"><code>val tt = 1 === 1</code></pre>
 </section><section class="slide level2">
 
