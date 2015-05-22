@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+<link rel="stylesheet" href="resources/reveal.js/css/reveal.css">
+  <link rel="stylesheet" href="resources/reveal.js/css/theme/white.css" id="theme">
+
+
+<!-- For syntax highlighting -->
+  <link rel="stylesheet" href="resources/reveal.js/lib/css/zenburn.css">
+
+
+<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+<script>
+  var link = document.createElement( 'link' );
+  link.rel = 'stylesheet';
+  link.type = 'text/css';
+  link.href = window.location.search.match( /print-pdf/gi ) ? 'resources/reveal.js/css/print/pdf.css' : 'resources/reveal.js/css/print/paper.css';
+  document.getElementsByTagName( 'head' )[0].appendChild( link );
+</script>
+
+<!--[if lt IE 9]>
+<script src="lib/js/html5shiv.js"></script>
+<![endif]-->
+</head>
+
+<body>
+
+<div class="reveal">
+
+<!-- Any section element inside of this container is displayed as a slide -->
+<div class="slides">
+
+<section>
+<h2>Scala!</h2><br/>
+<h3><span class="citation" data-cites="eparejatobes">@eparejatobes</span></h3><br/>
+<h5>today</h5><br/><br/>
+<img width="200" style="background:trasparent; border:none; box-shadow:none;" src="resources/logos/ohnoseq-logo.png"><br/>
+<img width="190" style="background:trasparent; border:none; box-shadow:none; margin:10px;" src="resources/logos/era7-logo.png">
+</section>
+
+
+<section><section id="scala" class="titleslide slide level1"><h1>Scala?</h1></section><section class="slide level2">
+
+<h4 id="session-structure">Session structure</h4>
+<ol type="1">
+<li>Generalities blahblahblah</li>
+<li>show me teh codez!</li>
+</ol>
+</section><section class="slide level2">
+
+</section></section>
+<section><section id="scala-1" class="titleslide slide level1"><h1>Scala</h1></section><section id="infrastructure" class="slide level2">
+<h1>Infrastructure</h1>
+<ul>
+<li><strong>JVM</strong>-based (GC, optimizations, …)</li>
+<li><strong>Java</strong> interoperability</li>
+<li>(can be) as fast as <strong>Java</strong>, sometimes more!</li>
+</ul>
+</section><section id="language-design" class="slide level2">
+<h1>Language design</h1>
+<ul>
+<li>(kinda) contains Java</li>
+<li>contains a functional language</li>
+<li>strict evaluation</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="wait-how">wait, <em>how?</em></h3>
+<p>well, it’s complicated…</p>
+</section><section class="slide level2">
+
+<h3 id="java-compat">Java compat</h3>
+<blockquote>
+<p>Scala = Java - “;”</p>
+</blockquote>
+<p>Not that is a good idea, but…</p>
+</section><section class="slide level2">
+
+<h3 id="java-compat-ii">Java compat II</h3>
+<p>All the huge Java library ecosystem directly available!</p>
+</section><section class="slide level2">
+
+<h3 id="functional-programming-in-scala">Functional programming in Scala</h3>
+<ul>
+<li>functions</li>
+<li>immutable values</li>
+<li>(primitive) recursion support</li>
+<li>method ⟷ function</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="functions">Functions</h3>
+<pre class="scala"><code>val f: String =&gt; Int = x =&gt; x.length
+val g: Int =&gt; Int = _+1
+(f andThen g)(&quot;hola&quot;)</code></pre>
+</section><section class="slide level2">
+
+<h3 id="immutable-values">Immutable values</h3>
+<pre class="scala"><code>val z = 3
+val u = &quot;hola&quot;
+val zu = z + u.size
+// nonono
+zu = zu + 3</code></pre>
+</section><section class="slide level2">
+
+<h3 id="recursion-support">Recursion support</h3>
+<pre class="scala"><code>import scala.annotation.tailrec
+@tailrec def factorial_rec(x: Int, y: Int): Int =  if (x == 1) y else factorial_rec(x - 1, x * y)
+def factorial(x: Int): Int = factorial_rec(x,1)</code></pre>
+</section><section class="slide level2">
+
+<h3 id="methods-functions">Methods ⟷ functions</h3>
+<pre class="scala"><code>val f: Int =&gt; Int = factorial
+def factorialAgain(x: Int) = f(x)</code></pre>
+</section><section class="slide level2">
+
+<h3 id="functional-programming-in-scala-ii">Functional programming in Scala II</h3>
+<ul>
+<li>pattern matching</li>
+<li>type abstraction (traits)</li>
+<li>objects (modules)</li>
+<li>parametric polymorphism (type constructors)</li>
+<li>type classes (through implicits)</li>
+<li>type-dependent types (type members)</li>
+<li>GADTs (sealed traits + pattern matching)</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="pattern-matching">Pattern matching</h3>
+<pre class="scala"><code>def length[X](l: List[X]): Int = length_rec(l,0)
+
+@tailrec def length_rec[X](l: List[X], acc: Int): Int = l match {
+
+  case Nil      =&gt; acc
+  case x :: xs  =&gt; length_rec(xs, 1 + acc)
+}</code></pre>
+</section><section id="section" class="slide level2">
+<h1><!-- and much more. Mention extractors, but also buggy implementation, type refinement not working, etc --></h1>
+<h3 id="pattern-matching-ii">Pattern matching II</h3>
+<pre class="scala"><code>object even {
+
+  def unapply(z: Int) = z % 2 == 0
+}
+
+def halve(x: Int) = x match {
+
+  case even() =&gt; Some( x / 2 )
+  case _      =&gt; None
+}</code></pre>
+<!-- Uses: match only on part of a datatype, model unsafe (runtime) dependent types -->
+</section><section class="slide level2">
+
+<h3 id="traits">Traits</h3>
+<p>API + (optional) code = trait</p>
+<pre class="scala"><code>trait Equals[X] {
+
+  def eq(x: X, other: X): Boolean
+  def notEq(x: X, other: X): Boolean = ! eq(x, other)
+}</code></pre>
+</section><section id="section-1" class="slide level2">
+<h1><!-- say something about multiple inheritance etc etc --></h1>
+<h3 id="objects">Objects</h3>
+<pre class="scala"><code>// why implicit? wait a bit
+implicit object DefaultIntEquals extends Equals[Int] {
+
+  // default eq
+  def eq(x: Int, other: Int): Boolean = x == y
+}</code></pre>
+</section><section class="slide level2">
+
+<h3 id="type-dependent-types">Type-dependent types</h3>
+<pre class="scala"><code>trait AnyProperty {
+
+  type Value
+  val value: Value
+}
+
+def get[P &lt;: AnyProperty](p: P): P#Value = p.value</code></pre>
+</section><section class="slide level2">
+
+<h3 id="parametric-polymorphism">Parametric polymorphism</h3>
+<pre class="scala"><code>def id[A]: A =&gt; A = a: A =&gt; a
+
+def compose[A,B,C](f: A =&gt; B, g: B =&gt; C): A =&gt; C = a =&gt; g(f(a))</code></pre>
+</section><section class="slide level2">
+
+<h3 id="gadts">GADTs</h3>
+<!-- TODO -->
+<h3 id="implicits">Implicits</h3>
+<p>aka compile-time code rewriting API. Powerful and dangerous!</p>
+<pre class="scala"><code>implicit def IntToString(x: Int) = x.toString
+val x: String = 2</code></pre>
+<h3 id="implicits-ii">Implicits II</h3>
+<p>Uses:</p>
+<ul>
+<li>type classes and extensible syntax</li>
+<li>type dependent pattern matching</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="type-classes-through-implicits">Type classes through implicits</h3>
+<p>Define syntax</p>
+<pre class="scala"><code>case class EqualsSyntax[X](val x: X, val equals: Equals[X]) {
+  import eq._
+  def ===(other: X): Boolean = eq(x,other)
+  def !==(other: X): Boolean = notEq(x,other)
+}</code></pre>
+<p>Provide it</p>
+<pre class="scala"><code>implicit def equalsSyntax[X](x: X)
+  (implicit eq: Equals[X]): EqualsSyntax[X] = EqualsSyntax(x,eq)</code></pre>
+<p>Use it!</p>
+<pre class="scala"><code>val tt = 1 === 1</code></pre>
+</section><section class="slide level2">
+
+<h3 id="type-system-summary">Type system summary</h3>
+<ul>
+<li>Incredibly complex</li>
+<li>powerful, the compiler is crap though</li>
+<li>nice ideas, spoilt by Java compat requirements</li>
+</ul>
+</section><section class="slide level2">
+
+<h4 id="single-most-useful-feature">Single most useful feature</h4>
+<p><strong>Type members</strong> (together with refinements)</p>
+<p>… and <strong>implicits</strong>! yeah that’s two :)</p>
+</section><section class="slide level2">
+
+<h3 id="where-scala-shines-dsls">Where Scala shines: DSLs</h3>
+<ul>
+<li>implicits</li>
+<li>overloading</li>
+<li>minimal set of reserved keywords</li>
+</ul>
+<p><strong>Example</strong> <a href="https://github.com/fogus/baysick">BASIC in Scala</a></p>
+</section><section class="slide level2">
+
+<h3 id="ecosystem">Ecosystem</h3>
+<ul>
+<li>Twitter stuff: <a href="https://twitter.github.io/finagle/">Finagle</a>, <a href="https://github.com/twitter/algebird">Algebird</a>, <a href="https://github.com/twitter/util">util</a>, <a href="https://github.com/twitter/summingbird">summingbird</a></li>
+<li><a href="https://spark.apache.org/">Spark</a></li>
+<li><a href="http://akka.io/">Akka</a></li>
+<li><a href="http://typelevel.org/">typelevel libraries</a></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="our-positive-experience">Our (positive) experience</h3>
+<ol type="1">
+<li>JVM, Java compat: incredibly useful</li>
+<li>really cool things are possible, but really hard. But possible!</li>
+<li>writing reasonably fast, easy to understand code without effort</li>
+<li>extensible build tool: <a href="http://www.scala-sbt.org/">sbt</a></li>
+</ol>
+</section><section class="slide level2">
+
+<h3 id="our-negative-experience">Our (negative) experience</h3>
+<ol type="1">
+<li>Scala contains <em>several</em> languages, fighting against each other; stick with one of them</li>
+<li>The compiler (type checker mostly) is crap</li>
+<li>Community: A lot of people saying a lot of incompatible things (see 1.)</li>
+<li>don’t use macros. Please.</li>
+</ol>
+</section></section>
+
+</div>
+
+<script src="resources/reveal.js/lib/js/head.min.js"></script>
+<script src="resources/reveal.js/js/reveal.js"></script>
+
+<script>
+  // Full list of configuration options available here:
+  // https://github.com/hakimel/reveal.js#configuration
+  Reveal.initialize({
+    controls: true,
+    progress: true,
+    history: true,
+    center: true,
+
+  // default/cube/page/concave/zoom/linear/fade/none
+  transition: 'slide',
+
+  // Optional libraries used to extend on reveal.js
+  dependencies: [
+    { src: 'resources/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+    { src: 'resources/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+    { src: 'resources/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+    { src: 'resources/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+    { src: 'resources/reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+    { src: 'resources/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+    // { src: 'resources/reveal.js/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+  ]
+  });
+
+</script>
+
+</body>
+</html>

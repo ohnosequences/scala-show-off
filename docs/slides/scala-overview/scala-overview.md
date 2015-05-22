@@ -1,3 +1,9 @@
+---
+title: "Scala!"
+author: "@eparejatobes"
+date: today
+---
+
 # Scala?
 
 - [@eparejatobes](https://github.com/eparejatobes)
@@ -120,7 +126,7 @@ def length[X](l: List[X]): Int = length_rec(l,0)
 @tailrec def length_rec[X](l: List[X], acc: Int): Int = l match {
 
   case Nil      => acc
-  case x :: xs  => length_rec(xs, 1 + acc) 
+  case x :: xs  => length_rec(xs, 1 + acc)
 }
 ```
 <!-- and much more. Mention extractors, but also buggy implementation, type refinement not working, etc -->
@@ -171,6 +177,7 @@ implicit object DefaultIntEquals extends Equals[Int] {
 }
 ```
 
+----
 
 ### Type-dependent types
 
@@ -231,21 +238,14 @@ case class EqualsSyntax[X](val x: X, val equals: Equals[X]) {
 }
 ```
 
-----
-
-### Type classes through implicits II
-
 Provide it
 
 ``` scala
-implicit def equalsSyntax[X](x: X)(implicit eq: Equals[X]): EqualsSyntax[X] = EqualsSyntax(x,eq)
+implicit def equalsSyntax[X](x: X)
+  (implicit eq: Equals[X]): EqualsSyntax[X] = EqualsSyntax(x,eq)
 ```
 
-----
-
-### Type classes through implicits III
-
-use it!
+Use it!
 
 ``` scala
 val tt = 1 === 1
