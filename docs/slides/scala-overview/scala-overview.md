@@ -91,7 +91,10 @@ zu = zu + 3
 
 ``` scala
 import scala.annotation.tailrec
-@tailrec def factorial_rec(x: Int, y: Int): Int =  if (x == 1) y else factorial_rec(x - 1, x * y)
+
+@tailrec def factorial_rec(x: Int, y: Int): Int =  
+  if (x == 1) y else factorial_rec(x - 1, x * y)
+
 def factorial(x: Int): Int = factorial_rec(x,1)
 ```
 
@@ -100,7 +103,9 @@ def factorial(x: Int): Int = factorial_rec(x,1)
 ### Methods ⟷ functions
 
 ``` scala
+// now is a function
 val f: Int => Int = factorial
+// now is a method
 def factorialAgain(x: Int) = f(x)
 ```
 
@@ -121,6 +126,7 @@ def factorialAgain(x: Int) = f(x)
 ### Pattern matching
 
 ``` scala
+// this could be a function if you want
 def length[X](l: List[X]): Int = length_rec(l,0)
 
 @tailrec def length_rec[X](l: List[X], acc: Int): Int = l match {
@@ -135,6 +141,7 @@ def length[X](l: List[X]): Int = length_rec(l,0)
 ### Pattern matching II
 
 ``` scala
+// custom patterns!
 object even {
 
   def unapply(z: Int) = z % 2 == 0
@@ -203,11 +210,6 @@ def compose[A,B,C](f: A => B, g: B => C): A => C = a => g(f(a))
 
 ----
 
-### GADTs
-
-<!-- TODO -->
-
-
 ### Implicits
 
 aka compile-time code rewriting API. Powerful and dangerous!
@@ -217,9 +219,11 @@ implicit def IntToString(x: Int) = x.toString
 val x: String = 2
 ```
 
+----
+
 ### Implicits II
 
-Uses:
+(reasonable) uses:
 
 - type classes and extensible syntax
 - type dependent pattern matching
@@ -238,6 +242,8 @@ case class EqualsSyntax[X](val x: X, val equals: Equals[X]) {
 }
 ```
 
+----
+
 Provide it
 
 ``` scala
@@ -245,9 +251,14 @@ implicit def equalsSyntax[X](x: X)
   (implicit eq: Equals[X]): EqualsSyntax[X] = EqualsSyntax(x,eq)
 ```
 
+----
+
 Use it!
 
 ``` scala
+// there are ways to provide this automatically
+implicit val intEq = DefaultIntEquals
+
 val tt = 1 === 1
 ```
 
