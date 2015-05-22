@@ -22,17 +22,17 @@ date: today
 
 ## Infrastructure
 
-- **JVM**-based (GC, optimizations, ...)
-- **Java** interoperability
-- (can be) as fast as **Java**, sometimes more!
+1. **JVM**-based (GC, optimizations, ...)
+1. **Java** interoperability
+1. (can be) as fast as **Java**, sometimes more!
 
 ----
 
 ## Language design
 
-- (kinda) contains Java
-- contains a functional language
-- strict evaluation
+1. (kinda) contains *Java*
+1. contains a *functional* language
+1. *strict* evaluation by default, laziness optional
 
 ----
 
@@ -293,16 +293,16 @@ val tt = 1 === 1
 ### Ecosystem
 
 - Twitter stuff: [Finagle](https://twitter.github.io/finagle/), [Algebird](https://github.com/twitter/algebird), [util](https://github.com/twitter/util), [summingbird](https://github.com/twitter/summingbird)
-- [Spark](https://spark.apache.org/)
-- [Akka](http://akka.io/)
-- [typelevel libraries](http://typelevel.org/)
+- [Spark](https://spark.apache.org/) _a better MapReduce_
+- [Akka](http://akka.io/) _all sort of low-level concurrency / distributed stuff_
+- [typelevel libraries](http://typelevel.org/) _act as a better standard library_
 
 ----
 
 ### Our (positive) experience
 
 1. JVM, Java compat: incredibly useful
-2. really cool things are possible, but really hard. But possible!
+2. really cool things are _possible_, but really _hard_. But **possible!**
 3. writing reasonably fast, easy to understand code without effort
 4. extensible build tool: [sbt](http://www.scala-sbt.org/)
 

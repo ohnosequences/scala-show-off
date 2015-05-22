@@ -58,18 +58,18 @@
 </section></section>
 <section><section id="scala-1" class="titleslide slide level1"><h1>Scala</h1></section><section id="infrastructure" class="slide level2">
 <h1>Infrastructure</h1>
-<ul>
+<ol type="1">
 <li><strong>JVM</strong>-based (GC, optimizations, …)</li>
 <li><strong>Java</strong> interoperability</li>
 <li>(can be) as fast as <strong>Java</strong>, sometimes more!</li>
-</ul>
+</ol>
 </section><section id="language-design" class="slide level2">
 <h1>Language design</h1>
-<ul>
-<li>(kinda) contains Java</li>
-<li>contains a functional language</li>
-<li>strict evaluation</li>
-</ul>
+<ol type="1">
+<li>(kinda) contains <em>Java</em></li>
+<li>contains a <em>functional</em> language</li>
+<li><em>strict</em> evaluation by default, laziness optional</li>
+</ol>
 </section><section class="slide level2">
 
 <h3 id="wait-how">wait, <em>how?</em></h3>
@@ -112,12 +112,17 @@ zu = zu + 3</code></pre>
 
 <h3 id="recursion-support">Recursion support</h3>
 <pre class="scala"><code>import scala.annotation.tailrec
-@tailrec def factorial_rec(x: Int, y: Int): Int =  if (x == 1) y else factorial_rec(x - 1, x * y)
+
+@tailrec def factorial_rec(x: Int, y: Int): Int =  
+  if (x == 1) y else factorial_rec(x - 1, x * y)
+
 def factorial(x: Int): Int = factorial_rec(x,1)</code></pre>
 </section><section class="slide level2">
 
 <h3 id="methods-functions">Methods ⟷ functions</h3>
-<pre class="scala"><code>val f: Int =&gt; Int = factorial
+<pre class="scala"><code>// now is a function
+val f: Int =&gt; Int = factorial
+// now is a method
 def factorialAgain(x: Int) = f(x)</code></pre>
 </section><section class="slide level2">
 
@@ -134,7 +139,8 @@ def factorialAgain(x: Int) = f(x)</code></pre>
 </section><section class="slide level2">
 
 <h3 id="pattern-matching">Pattern matching</h3>
-<pre class="scala"><code>def length[X](l: List[X]): Int = length_rec(l,0)
+<pre class="scala"><code>// this could be a function if you want
+def length[X](l: List[X]): Int = length_rec(l,0)
 
 @tailrec def length_rec[X](l: List[X], acc: Int): Int = l match {
 
@@ -144,7 +150,8 @@ def factorialAgain(x: Int) = f(x)</code></pre>
 </section><section id="section" class="slide level2">
 <h1><!-- and much more. Mention extractors, but also buggy implementation, type refinement not working, etc --></h1>
 <h3 id="pattern-matching-ii">Pattern matching II</h3>
-<pre class="scala"><code>object even {
+<pre class="scala"><code>// custom patterns!
+object even {
 
   def unapply(z: Int) = z % 2 == 0
 }
@@ -155,6 +162,7 @@ def halve(x: Int) = x match {
   case _      =&gt; None
 }</code></pre>
 <!-- Uses: match only on part of a datatype, model unsafe (runtime) dependent types -->
+
 </section><section class="slide level2">
 
 <h3 id="traits">Traits</h3>
@@ -191,14 +199,14 @@ def get[P &lt;: AnyProperty](p: P): P#Value = p.value</code></pre>
 def compose[A,B,C](f: A =&gt; B, g: B =&gt; C): A =&gt; C = a =&gt; g(f(a))</code></pre>
 </section><section class="slide level2">
 
-<h3 id="gadts">GADTs</h3>
-<!-- TODO -->
 <h3 id="implicits">Implicits</h3>
 <p>aka compile-time code rewriting API. Powerful and dangerous!</p>
 <pre class="scala"><code>implicit def IntToString(x: Int) = x.toString
 val x: String = 2</code></pre>
+</section><section class="slide level2">
+
 <h3 id="implicits-ii">Implicits II</h3>
-<p>Uses:</p>
+<p>(reasonable) uses:</p>
 <ul>
 <li>type classes and extensible syntax</li>
 <li>type dependent pattern matching</li>
@@ -212,11 +220,18 @@ val x: String = 2</code></pre>
   def ===(other: X): Boolean = eq(x,other)
   def !==(other: X): Boolean = notEq(x,other)
 }</code></pre>
+</section><section class="slide level2">
+
 <p>Provide it</p>
 <pre class="scala"><code>implicit def equalsSyntax[X](x: X)
   (implicit eq: Equals[X]): EqualsSyntax[X] = EqualsSyntax(x,eq)</code></pre>
+</section><section class="slide level2">
+
 <p>Use it!</p>
-<pre class="scala"><code>val tt = 1 === 1</code></pre>
+<pre class="scala"><code>// there are ways to provide this automatically
+implicit val intEq = DefaultIntEquals
+
+val tt = 1 === 1</code></pre>
 </section><section class="slide level2">
 
 <h3 id="type-system-summary">Type system summary</h3>
@@ -244,16 +259,16 @@ val x: String = 2</code></pre>
 <h3 id="ecosystem">Ecosystem</h3>
 <ul>
 <li>Twitter stuff: <a href="https://twitter.github.io/finagle/">Finagle</a>, <a href="https://github.com/twitter/algebird">Algebird</a>, <a href="https://github.com/twitter/util">util</a>, <a href="https://github.com/twitter/summingbird">summingbird</a></li>
-<li><a href="https://spark.apache.org/">Spark</a></li>
-<li><a href="http://akka.io/">Akka</a></li>
-<li><a href="http://typelevel.org/">typelevel libraries</a></li>
+<li><a href="https://spark.apache.org/">Spark</a> <em>a better MapReduce</em></li>
+<li><a href="http://akka.io/">Akka</a> <em>all sort of low-level concurrency / distributed stuff</em></li>
+<li><a href="http://typelevel.org/">typelevel libraries</a> <em>act as a better standard library</em></li>
 </ul>
 </section><section class="slide level2">
 
 <h3 id="our-positive-experience">Our (positive) experience</h3>
 <ol type="1">
 <li>JVM, Java compat: incredibly useful</li>
-<li>really cool things are possible, but really hard. But possible!</li>
+<li>really cool things are <em>possible</em>, but really <em>hard</em>. But <strong>possible!</strong></li>
 <li>writing reasonably fast, easy to understand code without effort</li>
 <li>extensible build tool: <a href="http://www.scala-sbt.org/">sbt</a></li>
 </ol>
